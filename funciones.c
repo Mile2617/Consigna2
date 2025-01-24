@@ -123,7 +123,12 @@ void monitorearContaminacion(Zona zonas[], int cantidadZonas) {
         printf("%-10s %-10s %-10s %-10s %-10s\n", "Dia", "CO2", "SO2", "NO2", "PM2.5");
 
         for (int j = 0; j < 35; j++) {
-            printf("%-10d %-10.2f %-10.2f %-10.2f %-10.2f\n", j + 1, zonas[i].co2[j], zonas[i].so2[j], zonas[i].no2[j], zonas[i].pm25[j]);
+            float co2 = (zonas[i].co2[j] > 1000) ? 0 : zonas[i].co2[j];
+            float so2 = (zonas[i].so2[j] > 1000) ? 0 : zonas[i].so2[j];
+            float no2 = (zonas[i].no2[j] > 1000) ? 0 : zonas[i].no2[j];
+            float pm25 = (zonas[i].pm25[j] > 1000) ? 0 : zonas[i].pm25[j];
+
+            printf("%-10d %-10.2f %-10.2f %-10.2f %-10.2f\n", j + 1, co2, so2, no2, pm25);
         }
 
         float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
@@ -199,7 +204,6 @@ void monitorearContaminacion(Zona zonas[], int cantidadZonas) {
     printf("PM2.5: Mayor: %s (%.2f µg/m³), Menor: %s (%.2f µg/m³)\n", maxPM25Zona, maxPM25, minPM25Zona, minPM25);
 }
 
-
 void emitirAlertas(Zona zonas[], int cantidadZonas) {
     printf("\n--- Alertas de Contaminacion ---\n");
 
@@ -244,10 +248,15 @@ void emitirAlertas(Zona zonas[], int cantidadZonas) {
 
 float calcularPromedio(float datos[], int dias) {
     float suma = 0;
+    int count = 0;
+
     for (int i = 0; i < dias; i++) {
-        suma += datos[i];
+        if (datos[i] <= 1000) { // Solo sumar valores válidos
+            suma += datos[i];
+            count++;
+        }
     }
-    return suma / dias;
+    return (count > 0) ? suma / count : 0; // Evitar división por 0
 }
 
 
