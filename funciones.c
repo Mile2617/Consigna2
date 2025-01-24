@@ -46,7 +46,7 @@ void leerDatosZona(char *nombreZona, float co2[], float so2[], float no2[], floa
         }
         fclose(archivo);
     } else {
-        printf("No se encontró el archivo para %s. Inicializando con ceros.\n", nombreZona);
+        printf("No se encontro el archivo para %s. Inicializando con ceros.\n", nombreZona);
         for (int j = 0; j < 30; j++) {
             co2[j] = so2[j] = no2[j] = pm25[j] = 0;
         }
@@ -106,14 +106,31 @@ float promedioPonderado(float datos[], int dias) {
 
 void predecirContaminacion(Zona zonas[], int cantidadZonas) {
     printf("\n--- Prediccion de Contaminacion ---\n");
+
     for (int i = 0; i < cantidadZonas; i++) {
+        // Filtrar valores mayores a 1000 antes de calcular la prediccion
+        for (int j = 0; j < 35; j++) {
+            if (zonas[i].co2[j] > 1000) zonas[i].co2[j] = 0;
+            if (zonas[i].so2[j] > 1000) zonas[i].so2[j] = 0;
+            if (zonas[i].no2[j] > 1000) zonas[i].no2[j] = 0;
+            if (zonas[i].pm25[j] > 1000) zonas[i].pm25[j] = 0;
+        }
+
+        // Calcular predicciones ponderadas
+        float prediccionCO2 = promedioPonderado(zonas[i].co2, 35);
+        float prediccionSO2 = promedioPonderado(zonas[i].so2, 35);
+        float prediccionNO2 = promedioPonderado(zonas[i].no2, 35);
+        float prediccionPM25 = promedioPonderado(zonas[i].pm25, 35);
+
+        // Imprimir predicciones
         printf("Zona: %s\n", zonas[i].nombreZona);
-        printf("Prediccion CO2: %.2f ppm\n", promedioPonderado(zonas[i].co2, 35));
-        printf("Prediccion SO2: %.2f ppb\n", promedioPonderado(zonas[i].so2, 35));
-        printf("Prediccion NO2: %.2f ppb\n", promedioPonderado(zonas[i].no2, 35));
-        printf("Prediccion PM2.5: %.2f µg/m³\n", promedioPonderado(zonas[i].pm25, 35));
+        printf("Prediccion CO2: %.2f ppm\n", prediccionCO2);
+        printf("Prediccion SO2: %.2f ppb\n", prediccionSO2);
+        printf("Prediccion NO2: %.2f ppb\n", prediccionNO2);
+        printf("Prediccion PM2.5: %.2f µg/m³\n", prediccionPM25);
     }
 }
+
 
 void monitorearContaminacion(Zona zonas[], int cantidadZonas) {
     printf("\n--- Monitoreo de Contaminacion ---\n");
@@ -204,47 +221,6 @@ void monitorearContaminacion(Zona zonas[], int cantidadZonas) {
     printf("PM2.5: Mayor: %s (%.2f µg/m³), Menor: %s (%.2f µg/m³)\n", maxPM25Zona, maxPM25, minPM25Zona, minPM25);
 }
 
-void emitirAlertas(Zona zonas[], int cantidadZonas) {
-    printf("\n--- Alertas de Contaminacion ---\n");
-
-    for (int i = 0; i < cantidadZonas; i++) {
-        // Calcular promedios individuales de cada contaminante
-        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
-        float promedioSO2 = calcularPromedio(zonas[i].so2, 35);
-        float promedioNO2 = calcularPromedio(zonas[i].no2, 35);
-        float promedioPM25 = calcularPromedio(zonas[i].pm25, 35);
-
-        // Calcular promedio total de contaminantes
-        float promedioTotal = (promedioCO2 / MAX_CO2 + 
-                               promedioSO2 / MAX_SO2 + 
-                               promedioNO2 / MAX_NO2 + 
-                               promedioPM25 / MAX_PM25) / 4;
-
-        printf("Zona: %s\n", zonas[i].nombreZona);
-
-        if (promedioTotal > 1.0) {
-            printf("- ALERTA: Promedio total de contaminantes elevado (%.2f, Limite: 1.00)\n", promedioTotal);
-            printf("  Detalles por contaminante:\n");
-            if (promedioCO2 > LIMITE_CO2) {
-                printf("  - CO2: %.2f ppm (Limite: %.2f ppm)\n", promedioCO2, LIMITE_CO2);
-            }
-            if (promedioSO2 > LIMITE_SO2) {
-                printf("  - SO2: %.2f ppb (Limite: %.2f ppb)\n", promedioSO2, LIMITE_SO2);
-            }
-            if (promedioNO2 > LIMITE_NO2) {
-                printf("  - NO2: %.2f ppb (Limite: %.2f ppb)\n", promedioNO2, LIMITE_NO2);
-            }
-            if (promedioPM25 > LIMITE_PM25) {
-                printf("  - PM2.5: %.2f µg/m³ (Limite: %.2f µg/m³)\n", promedioPM25, LIMITE_PM25);
-            }
-        } else {
-            printf("Sin alertas en esta zona.\n");
-        }
-
-        printf("\n");
-    }
-}
-
 
 float calcularPromedio(float datos[], int dias) {
     float suma = 0;
@@ -256,7 +232,7 @@ float calcularPromedio(float datos[], int dias) {
             count++;
         }
     }
-    return (count > 0) ? suma / count : 0; // Evitar división por 0
+    return (count > 0) ? suma / count : 0; // Evitar division por 0
 }
 
 
@@ -321,35 +297,6 @@ void calcularMejorPeorZona(Zona zonas[], int cantidadZonas) {
     printf("PM2.5: Mejor Zona: %s (%.2f µg/m³), Peor Zona: %s (%.2f µg/m³)\n", mejorZonaPM25, mejorPM25, peorZonaPM25, peorPM25);
 }
 
-
-void generarRecomendaciones(Zona zonas[], int cantidadZonas) {
-    printf("\n--- Recomendaciones ---\n");
-    for (int i = 0; i < cantidadZonas; i++) {
-        // Filtrar valores mayores a 1000 antes de calcular los promedios
-        for (int j = 0; j < 35; j++) {
-            if (zonas[i].co2[j] > 1000) zonas[i].co2[j] = 0;
-            if (zonas[i].pm25[j] > 1000) zonas[i].pm25[j] = 0;
-        }
-
-        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
-        float promedioPM25 = calcularPromedio(zonas[i].pm25, 35);
-
-        printf("Zona: %s\n", zonas[i].nombreZona);
-
-        if (promedioCO2 > LIMITE_CO2) {
-            printf("- Reduzca el tráfico vehicular y considere el cierre temporal de industrias.\n");
-        }
-        if (promedioPM25 > LIMITE_PM25) {
-            printf("- Suspenda actividades al aire libre.\n");
-        }
-
-        if (promedioCO2 <= LIMITE_CO2 && promedioPM25 <= LIMITE_PM25) {
-            printf("- Calidad del aire dentro de los límites aceptables.\n");
-        }
-    }
-}
-
-
 void exportarDatos(Zona zonas[], int cantidadZonas) {
     FILE *archivo = fopen("reporte_contaminacion.txt", "w");
     if (!archivo) {
@@ -384,3 +331,115 @@ void calcularPromediosHistoricos(Zona zonas[], int cantidadZonas) {
     }
 }
 
+void emitirAlertas(Zona zonas[], int cantidadZonas) {
+    printf("\n--- Alertas de Contaminacion ---\n");
+
+    for (int i = 0; i < cantidadZonas; i++) {
+        printf("Zona: %s\n", zonas[i].nombreZona);
+
+        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
+        float promedioSO2 = calcularPromedio(zonas[i].so2, 35);
+        float promedioNO2 = calcularPromedio(zonas[i].no2, 35);
+        float promedioPM25 = calcularPromedio(zonas[i].pm25, 35);
+
+        // Alertas según los niveles de contaminacion
+        if (promedioCO2 > 600) {
+            printf("  - CO2: %.2f ppm -> ", promedioCO2);
+            if (promedioCO2 <= 800) {
+                printf("ALERTA: Niveles altos. Limitar tráfico vehicular y promover transporte público.\n");
+            } else {
+                printf("ALERTA URGENTE: Niveles muy altos. Prohibir actividades industriales temporalmente.\n");
+            }
+        }
+
+        if (promedioSO2 > 50) {
+            printf("  - SO2: %.2f ppb -> ", promedioSO2);
+            if (promedioSO2 <= 100) {
+                printf("ALERTA: Niveles altos. Restringir emisiones de fábricas y refinerias.\n");
+            } else {
+                printf("ALERTA URGENTE: Niveles muy altos. Parar operaciones de plantas industriales.\n");
+            }
+        }
+
+        if (promedioNO2 > 80) {
+            printf("  - NO2: %.2f ppb -> ", promedioNO2);
+            if (promedioNO2 <= 120) {
+                printf("ALERTA: Niveles altos. Reducir emisiones vehiculares con restricciones de circulacion.\n");
+            } else {
+                printf("ALERTA URGENTE: Niveles muy altos. Prohibir actividades al aire libre.\n");
+            }
+        }
+
+        if (promedioPM25 > 50) {
+            printf("  - PM2.5: %.2f µg/m³ -> ", promedioPM25);
+            if (promedioPM25 <= 100) {
+                printf("ALERTA: Niveles altos. Restringir actividades al aire libre y quemas agricolas.\n");
+            } else {
+                printf("ALERTA URGENTE: Niveles muy altos. Recomendacion de uso de mascarillas y cierre de escuelas.\n");
+            }
+        }
+
+        if (promedioCO2 <= 600 && promedioSO2 <= 50 && promedioNO2 <= 80 && promedioPM25 <= 50) {
+            printf("Sin alertas para esta zona. Calidad del aire dentro de limites aceptables.\n");
+        }
+
+        printf("\n");
+    }
+}
+
+
+void generarRecomendaciones(Zona zonas[], int cantidadZonas) {
+    printf("\n--- Recomendaciones para Mejorar la Calidad del Aire ---\n");
+
+    for (int i = 0; i < cantidadZonas; i++) {
+        printf("Zona: %s\n", zonas[i].nombreZona);
+
+        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
+        float promedioSO2 = calcularPromedio(zonas[i].so2, 35);
+        float promedioNO2 = calcularPromedio(zonas[i].no2, 35);
+        float promedioPM25 = calcularPromedio(zonas[i].pm25, 35);
+
+        // Recomendaciones especificas según niveles de contaminacion
+        if (promedioCO2 > 600) {
+            printf("  - CO2: %.2f ppm -> ", promedioCO2);
+            if (promedioCO2 <= 800) {
+                printf("Recomendacion: Incentivar uso de transporte público y bicicletas.\n");
+            } else {
+                printf("Recomendacion URGENTE: Implementar cierre temporal de industrias y restriccion vehicular total.\n");
+            }
+        }
+
+        if (promedioSO2 > 50) {
+            printf("  - SO2: %.2f ppb -> ", promedioSO2);
+            if (promedioSO2 <= 100) {
+                printf("Recomendacion: Monitorear emisiones de fábricas y mejorar tecnologia de filtrado.\n");
+            } else {
+                printf("Recomendacion URGENTE: Suspender temporalmente operaciones industriales de alto impacto.\n");
+            }
+        }
+
+        if (promedioNO2 > 80) {
+            printf("  - NO2: %.2f ppb -> ", promedioNO2);
+            if (promedioNO2 <= 120) {
+                printf("Recomendacion: Reducir horarios pico vehiculares y promover energias limpias.\n");
+            } else {
+                printf("Recomendacion URGENTE: Suspender actividades al aire libre y aplicar restricciones estrictas al tráfico.\n");
+            }
+        }
+
+        if (promedioPM25 > 50) {
+            printf("  - PM2.5: %.2f µg/m³ -> ", promedioPM25);
+            if (promedioPM25 <= 100) {
+                printf("Recomendacion: Evitar quemas agricolas y promover campañas de forestacion urbana.\n");
+            } else {
+                printf("Recomendacion URGENTE: Distribuir mascarillas y restringir actividades al aire libre por completo.\n");
+            }
+        }
+
+        if (promedioCO2 <= 600 && promedioSO2 <= 50 && promedioNO2 <= 80 && promedioPM25 <= 50) {
+            printf("- Excelente calidad del aire. Continuar con politicas actuales de mitigacion.\n");
+        }
+
+        printf("\n");
+    }
+}

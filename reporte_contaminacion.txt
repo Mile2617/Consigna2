@@ -1,26 +1,26 @@
-Reporte de Contaminación
+Reporte de Contaminacion
 Zona: QuitoNorte
-Promedio CO2: 2252715964506621200000000000000.00 ppm
-Promedio SO2: 2252715964506621200000000000000.00 ppb
-Promedio NO2: 2252715964506621200000000000000.00 ppb
-Promedio PM2.5: 2252715964506621200000000000000.00 µg/m³
-Zona: QuitoSur
-Promedio CO2: 2114389014270905600000000000000.00 ppm
-Promedio SO2: 2114389014270905600000000000000.00 ppb
-Promedio NO2: 2114389014270905600000000000000.00 ppb
-Promedio PM2.5: 2114389014270905600000000000000.00 µg/m³
-Zona: QuitoCentro
-Promedio CO2: 32658988502614990000000000.00 ppm
-Promedio SO2: 32658988502614990000000000.00 ppb
-Promedio NO2: 32658988502614990000000000.00 ppb
-Promedio PM2.5: 32658988502614990000000000.00 µg/m³
-Zona: Valle
-Promedio CO2: 31288090913354609000.00 ppm
-Promedio SO2: 31288090913354609000.00 ppb
-Promedio NO2: 31288090913354609000.00 ppb
-Promedio PM2.5: 31288090913354609000.00 µg/m³
-Zona: Tumbaco
-Promedio CO2: 237.83 ppm
-Promedio SO2: 202.89 ppb
-Promedio NO2: 169.17 ppb
-Promedio PM2.5: 137.11 µg/m³
+Promedio CO2: 358.86 ppm
+Promedio SO2: 332.69 ppb
+Promedio NO2: 314.26 ppb
+Promedio PM2.5: 272.54 µg/m³
+Zona: 
+Promedio CO2: 205.00 ppm
+Promedio SO2: 236.60 ppb
+Promedio NO2: 256.43 ppb
+Promedio PM2.5: 299.60 µg/m³
+Zona: 
+Promedio CO2: 378.69 ppm
+Promedio SO2: 357.83 ppb
+Promedio NO2: 337.57 ppb
+Promedio PM2.5: 306.46 µg/m³
+Zona: 
+Promedio CO2: 209.66 ppm
+Promedio SO2: 215.74 ppb
+Promedio NO2: 212.63 ppb
+Promedio PM2.5: 214.74 µg/m³
+Zona: 
+Promedio CO2: 221.49 ppm
+Promedio SO2: 174.97 ppb
+Promedio NO2: 138.86 ppb
+Promedio PM2.5: 103.80 µg/m³
