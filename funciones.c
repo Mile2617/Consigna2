@@ -325,16 +325,30 @@ void calcularMejorPeorZona(Zona zonas[], int cantidadZonas) {
 void generarRecomendaciones(Zona zonas[], int cantidadZonas) {
     printf("\n--- Recomendaciones ---\n");
     for (int i = 0; i < cantidadZonas; i++) {
-        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
-        if (promedioCO2 > LIMITE_CO2) {
-            printf("Zona %s: Reduzca el tráfico vehicular y considere el cierre temporal de industrias.\n", zonas[i].nombreZona);
+        // Filtrar valores mayores a 1000 antes de calcular los promedios
+        for (int j = 0; j < 35; j++) {
+            if (zonas[i].co2[j] > 1000) zonas[i].co2[j] = 0;
+            if (zonas[i].pm25[j] > 1000) zonas[i].pm25[j] = 0;
         }
+
+        float promedioCO2 = calcularPromedio(zonas[i].co2, 35);
         float promedioPM25 = calcularPromedio(zonas[i].pm25, 35);
+
+        printf("Zona: %s\n", zonas[i].nombreZona);
+
+        if (promedioCO2 > LIMITE_CO2) {
+            printf("- Reduzca el tráfico vehicular y considere el cierre temporal de industrias.\n");
+        }
         if (promedioPM25 > LIMITE_PM25) {
-            printf("Zona %s: Suspenda actividades al aire libre.\n", zonas[i].nombreZona);
+            printf("- Suspenda actividades al aire libre.\n");
+        }
+
+        if (promedioCO2 <= LIMITE_CO2 && promedioPM25 <= LIMITE_PM25) {
+            printf("- Calidad del aire dentro de los límites aceptables.\n");
         }
     }
 }
+
 
 void exportarDatos(Zona zonas[], int cantidadZonas) {
     FILE *archivo = fopen("reporte_contaminacion.txt", "w");
